@@ -6,8 +6,8 @@
 import * as vscode from 'vscode';
 
 export interface RawNotebookCell {
-	// leadingWhitespace: string;
-	// trailingWhitespace: string;
+	leadingWhitespace: string;
+	trailingWhitespace: string;
 	language: string;
 	content: string;
 	kind: vscode.CellKind;
@@ -28,60 +28,88 @@ const LANG_ABBREVS = new Map(
 );
 
 export function parseMarkdown(content: string): RawNotebookCell[] {
-	const lines = content.trim().split('\n');
+	const lines = content.split('\n');
 	let cells: RawNotebookCell[] = [];
 	let i = 0;
-	for (; i < lines.length; i++) {
-		while (lines[i] === '') {
-			// Eat extra whitespace lines
-			i++;
-		}
 
+	// Each parse function starts with line i, leaves i on the line after the last line parsed
+	for (; i < lines.length;) {
+		const leadingWhitespace = i === 0 ? parseWhitespaceLines(true) : '';
 		if (lines[i].startsWith(CODE_BLOCK_MARKER)) {
-			parseCodeBlock();
+			parseCodeBlock(leadingWhitespace);
 		} else {
-			parseMarkdownParagraph();
+			parseMarkdownParagraph(leadingWhitespace);
 		}
 	}
 
-	function parseCodeBlock(): void {
+	function parseWhitespaceLines(isFirst: boolean): string {
+		let start = i;
+		const nextNonWhitespaceLineOffset = lines.slice(start).findIndex(l => l !== '');
+		let end: number; // will be next line or overflow
+		let isLast = false;
+		if (nextNonWhitespaceLineOffset < 0) {
+			end = lines.length;
+			isLast = true;
+		} else {
+			end = start + nextNonWhitespaceLineOffset;
+		}
+
+		i = end;
+		const numWhitespaceLines = end - start + (isFirst || isLast ? 0 : 1);
+		return '\n'.repeat(numWhitespaceLines);
+	}
+
+	function parseCodeBlock(leadingWhitespace: string): void {
 		const l = lines[i].substring(CODE_BLOCK_MARKER.length);
 		const language = LANG_FULLNAMES.get(l) || l;
 		const startSourceIdx = ++i;
-		let endSourceIdx: number;
 		while (true) {
 			const currLine = lines[i];
-			if (!currLine) {
-				endSourceIdx = i;
+			if (i >= lines.length) {
 				break;
 			} else if (currLine.startsWith(CODE_BLOCK_MARKER)) {
-				endSourceIdx = i - 1;
+				i++; // consume block end marker
 				break;
 			}
 
 			i++;
 		}
 
-		const content = lines.slice(startSourceIdx, endSourceIdx + 1).join('\n');
-		cells.push({ language, content, kind: vscode.CellKind.Code });
+		const content = lines.slice(startSourceIdx, i - 1).join('\n');
+		const trailingWhitespace = parseWhitespaceLines(false);
+		cells.push({
+			language,
+			content,
+			kind: vscode.CellKind.Code,
+			leadingWhitespace: leadingWhitespace,
+			trailingWhitespace: trailingWhitespace
+		});
 	}
 
-	function parseMarkdownParagraph(): void {
+	function parseMarkdownParagraph(leadingWhitespace: string): void {
 		const startSourceIdx = i;
-		let endSourceIdx: number;
 		while (true) {
-			const currLine = lines[++i];
-			if (!currLine) {
-				endSourceIdx = i;
-				break;
-			} else if (currLine === '') {
-				endSourceIdx = i - 1;
+			if (i >= lines.length) {
 				break;
 			}
+
+			const currLine = lines[i];
+			if (currLine === '') {
+				break;
+			}
+
+			i++;
 		}
 
-		const content = lines.slice(startSourceIdx, endSourceIdx + 1).join('\n');
-		cells.push({ language: 'markdown', content, kind: vscode.CellKind.Markdown });
+		const content = lines.slice(startSourceIdx, i).join('\n');
+		const trailingWhitespace = parseWhitespaceLines(false);
+		cells.push({
+			language: 'markdown',
+			content,
+			kind: vscode.CellKind.Markdown,
+			leadingWhitespace: leadingWhitespace,
+			trailingWhitespace: trailingWhitespace
+		});
 	}
 
 	return cells;
@@ -91,15 +119,17 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 	let result = '';
 	for (let i = 0; i < cells.length; i++) {
 		const cell = cells[i];
+		result += cell.metadata.custom?.leadingWhitespace || '';
 		if (cell.cellKind === vscode.CellKind.Code) {
-			const languageAbbrev = LANG_ABBREVS.get(cell.language);
+			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
 			const codePrefix = CODE_BLOCK_MARKER + languageAbbrev + '\n';
-			const codeSuffix = '\n' + CODE_BLOCK_MARKER + '\n\n';
+			const codeSuffix = '\n' + CODE_BLOCK_MARKER;
 
 			result += codePrefix + cell.document.getText() + codeSuffix;
 		} else {
-			result += cell.document.getText() + '\n';
+			result += cell.document.getText();
 		}
+		result += cell.metadata.custom?.trailingWhitespace || '';
 	}
 	return result;
 }

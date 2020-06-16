@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { parseMarkdown, writeCellsToMarkdown } from './markdownParser';
+import { parseMarkdown, writeCellsToMarkdown, RawNotebookCell } from './markdownParser';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown', new MarkdownProvider()));
@@ -18,13 +18,7 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 			.toString('utf8');
 
 		const cellRawData = parseMarkdown(content);
-		const cells = cellRawData.map(data => (<vscode.NotebookCellData>{
-			cellKind: data.kind,
-			language: data.language,
-			metadata: { editable: true, runnable: false },
-			outputs: [],
-			source: data.content
-		}));
+		const cells = cellRawData.map(rawToNotebookCellData);
 
 		return {
 			languages,
@@ -45,6 +39,16 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 
 	private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
 	readonly onDidChangeNotebook = this._onDidChangeNotebook.event;
+}
+
+export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCellData {
+	return <vscode.NotebookCellData>{
+		cellKind: data.kind,
+		language: data.language,
+		metadata: { editable: true, runnable: false, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace } },
+		outputs: [],
+		source: data.content
+	};
 }
 
 export function deactivate() { }
