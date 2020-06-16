@@ -1,9 +1,10 @@
 {
-	"name": "notebook-markdown",
-	"publisher": "roblourens",
+	"name": "vscode-markdown-notebook",
+	"publisher": "ms-vscode",
 	"displayName": "notebook-markdown",
-	"description": "",
+	"description": "An extension for editing markdown files in VS Code notebooks",
 	"version": "0.0.1",
+	"preview": true,
 	"enableProposedApi": true,
 	"engines": {
 		"vscode": "^1.46.0"
@@ -19,7 +20,7 @@
 		"notebookProvider": [
 			{
 				"viewType": "markdown",
-				"displayName": "Markdown",
+				"displayName": "Markdown Notebook",
 				"priority": "option",
 				"selector": [
 					{
