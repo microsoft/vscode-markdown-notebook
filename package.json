@@ -9,6 +9,9 @@
 	"engines": {
 		"vscode": "^1.46.0"
 	},
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-markdown-notebook"
+	},
 	"categories": [
 		"Other"
 	],
