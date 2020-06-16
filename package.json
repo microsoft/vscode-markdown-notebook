@@ -1,7 +1,7 @@
 {
 	"name": "vscode-markdown-notebook",
 	"publisher": "ms-vscode",
-	"displayName": "notebook-markdown",
+	"displayName": "Markdown Notebook",
 	"description": "An extension for editing markdown files in VS Code notebooks",
 	"version": "0.0.4",
 	"preview": true,
