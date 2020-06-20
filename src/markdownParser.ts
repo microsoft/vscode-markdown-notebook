@@ -14,17 +14,18 @@ export interface RawNotebookCell {
 }
 
 const CODE_BLOCK_MARKER = '```';
-const LANG_FULLNAMES = new Map([
+const LANG_IDS = new Map([
 	['bat', 'batch'],
 	['c++', 'cpp'],
 	['js', 'javascript'],
+	['ts', 'typescript'],
 	['cs', 'csharp'],
 	['py', 'python'],
 	['py2', 'python'],
 	['py3', 'python'],
 ]);
 const LANG_ABBREVS = new Map(
-	Array.from(LANG_FULLNAMES.keys()).map(k => [LANG_FULLNAMES.get(k), k])
+	Array.from(LANG_IDS.keys()).map(k => [LANG_IDS.get(k), k])
 );
 
 export function parseMarkdown(content: string): RawNotebookCell[] {
@@ -61,7 +62,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 
 	function parseCodeBlock(leadingWhitespace: string): void {
 		const l = lines[i].substring(CODE_BLOCK_MARKER.length);
-		const language = LANG_FULLNAMES.get(l) || l;
+		const language = LANG_IDS.get(l) || l;
 		const startSourceIdx = ++i;
 		while (true) {
 			const currLine = lines[i];
