@@ -73,6 +73,16 @@ suite('parseMarkdown', () => {
 		assert.equal(cells[1].leadingWhitespace, '');
 		assert.equal(cells[1].trailingWhitespace, '\n');
 	});
+
+	test('indented code cell', () => {
+		const cells = parseMarkdown('    ```js\n    // indented js block\n    ```\n# More content');
+		assert.equal(cells.length, 2);
+
+		assert.equal(cells[0].content, '// indented js block');
+		assert.equal(cells[0].indentation, '    ');
+
+		assert.equal(cells[1].content, '# More content');
+	});
 });
 
 function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell {
@@ -104,5 +114,7 @@ suite('writeMarkdown', () => {
 
 		testWriteMarkdown('```js\nlet x = 1;\n```\n\n# hello\n');
 		testWriteMarkdown('```js\nlet x = 1;\n```\n\n```ts\nlet y = 2;\n```\n# hello\n');
+
+		testWriteMarkdown('    ```js\n    // indented code cell\n    ```');
 	});
 });

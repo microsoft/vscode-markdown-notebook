@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 
 export interface RawNotebookCell {
+	indentation?: string;
 	leadingWhitespace: string;
 	trailingWhitespace: string;
 	language: string;
@@ -13,7 +14,6 @@ export interface RawNotebookCell {
 	kind: vscode.CellKind;
 }
 
-const CODE_BLOCK_MARKER = '```';
 const LANG_IDS = new Map([
 	['bat', 'batch'],
 	['c++', 'cpp'],
@@ -28,6 +28,27 @@ const LANG_ABBREVS = new Map(
 	Array.from(LANG_IDS.keys()).map(k => [LANG_IDS.get(k), k])
 );
 
+interface ICodeBlockStart {
+	langId: string;
+	indentation: string
+}
+
+/**
+ * Note - the indented code block parsing is basic. It should only be applied inside lists, indentation should be consistent across lines and
+ * between the start and end blocks, etc. This is good enough for typical use cases.
+ */
+function parseCodeBlockStart(line: string): ICodeBlockStart | null {
+	const match = line.match(/(    |\t)?```(\S*)/);
+	return match && {
+		indentation: match[1],
+		langId: match[2]
+	};
+}
+
+function isCodeBlockEndLine(line: string): boolean {
+	return !!line.match(/^\s*```/);
+}
+
 export function parseMarkdown(content: string): RawNotebookCell[] {
 	const lines = content.split('\n');
 	let cells: RawNotebookCell[] = [];
@@ -36,8 +57,9 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 	// Each parse function starts with line i, leaves i on the line after the last line parsed
 	for (; i < lines.length;) {
 		const leadingWhitespace = i === 0 ? parseWhitespaceLines(true) : '';
-		if (lines[i].startsWith(CODE_BLOCK_MARKER)) {
-			parseCodeBlock(leadingWhitespace);
+		const codeBlockMatch = parseCodeBlockStart(lines[i]);
+		if (codeBlockMatch) {
+			parseCodeBlock(leadingWhitespace, codeBlockMatch);
 		} else {
 			parseMarkdownParagraph(leadingWhitespace);
 		}
@@ -60,15 +82,14 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 		return '\n'.repeat(numWhitespaceLines);
 	}
 
-	function parseCodeBlock(leadingWhitespace: string): void {
-		const l = lines[i].substring(CODE_BLOCK_MARKER.length);
-		const language = LANG_IDS.get(l) || l;
+	function parseCodeBlock(leadingWhitespace: string, codeBlockStart: ICodeBlockStart): void {
+		const language = LANG_IDS.get(codeBlockStart.langId) || codeBlockStart.langId;
 		const startSourceIdx = ++i;
 		while (true) {
 			const currLine = lines[i];
 			if (i >= lines.length) {
 				break;
-			} else if (currLine.startsWith(CODE_BLOCK_MARKER)) {
+			} else if (isCodeBlockEndLine(currLine)) {
 				i++; // consume block end marker
 				break;
 			}
@@ -76,14 +97,17 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 			i++;
 		}
 
-		const content = lines.slice(startSourceIdx, i - 1).join('\n');
+		const content = lines.slice(startSourceIdx, i - 1)
+			.map(line => line.replace(new RegExp('^' + codeBlockStart.indentation), ''))
+			.join('\n');
 		const trailingWhitespace = parseWhitespaceLines(false);
 		cells.push({
 			language,
 			content,
 			kind: vscode.CellKind.Code,
 			leadingWhitespace: leadingWhitespace,
-			trailingWhitespace: trailingWhitespace
+			trailingWhitespace: trailingWhitespace,
+			indentation: codeBlockStart.indentation
 		});
 	}
 
@@ -122,11 +146,15 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 		const cell = cells[i];
 		result += cell.metadata.custom?.leadingWhitespace || '';
 		if (cell.cellKind === vscode.CellKind.Code) {
+			const indentation = cell.metadata.custom?.indentation || '';
 			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
-			const codePrefix = CODE_BLOCK_MARKER + languageAbbrev + '\n';
-			const codeSuffix = '\n' + CODE_BLOCK_MARKER;
+			const codePrefix = indentation + '```' + languageAbbrev + '\n';
+			const contents = cell.document.getText().split('\n')
+				.map(line => indentation + line)
+				.join('\n');
+			const codeSuffix = '\n' + indentation + '```';
 
-			result += codePrefix + cell.document.getText() + codeSuffix;
+			result += codePrefix + contents + codeSuffix;
 		} else {
 			result += cell.document.getText();
 		}

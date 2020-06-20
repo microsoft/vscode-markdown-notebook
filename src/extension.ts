@@ -45,7 +45,7 @@ export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCel
 	return <vscode.NotebookCellData>{
 		cellKind: data.kind,
 		language: data.language,
-		metadata: { editable: true, runnable: false, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace } },
+		metadata: { editable: true, runnable: false, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } },
 		outputs: [],
 		source: data.content
 	};
