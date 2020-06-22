@@ -22,7 +22,7 @@
 	"contributes": {
 		"notebookProvider": [
 			{
-				"viewType": "markdown",
+				"viewType": "markdown-notebook",
 				"displayName": "Markdown Notebook",
 				"priority": "option",
 				"selector": [
