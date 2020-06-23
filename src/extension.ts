@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { parseMarkdown, writeCellsToMarkdown, RawNotebookCell } from './markdownParser';
 
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown', new MarkdownProvider()));
+	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown-notebook', new MarkdownProvider()));
 }
 
 class MarkdownProvider implements vscode.NotebookContentProvider {
