@@ -74,6 +74,19 @@ suite('parseMarkdown', () => {
 		assert.equal(cells[1].trailingWhitespace, '\n');
 	});
 
+	test('markdown, code cell with no whitespace between', () => {
+		const cells = parseMarkdown('# hello\nfoo\n```js\nlet x = 1;\n```\n');
+		assert.equal(cells.length, 2);
+
+		assert.equal(cells[0].content, '# hello\nfoo');
+		assert.equal(cells[0].leadingWhitespace, '');
+		assert.equal(cells[0].trailingWhitespace, '\n');
+
+		assert.equal(cells[1].content, 'let x = 1;');
+		assert.equal(cells[1].leadingWhitespace, '');
+		assert.equal(cells[1].trailingWhitespace, '\n');
+	});
+
 	test('indented code cell', () => {
 		const cells = parseMarkdown('    ```js\n    // indented js block\n    ```\n# More content');
 		assert.equal(cells.length, 2);

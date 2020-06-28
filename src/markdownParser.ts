@@ -45,6 +45,10 @@ function parseCodeBlockStart(line: string): ICodeBlockStart | null {
 	};
 }
 
+function isCodeBlockStart(line: string): boolean {
+	return !!parseCodeBlockStart(line);
+}
+
 function isCodeBlockEndLine(line: string): boolean {
 	return !!line.match(/^\s*```/);
 }
@@ -119,7 +123,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 			}
 
 			const currLine = lines[i];
-			if (currLine === '') {
+			if (currLine === '' || isCodeBlockStart(currLine)) {
 				break;
 			}
 
