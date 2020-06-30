@@ -96,6 +96,18 @@ suite('parseMarkdown', () => {
 
 		assert.equal(cells[1].content, '# More content');
 	});
+
+	test('CRLF', () => {
+		const cells = parseMarkdown('```js\r\nlet x = 1;\r\n```\r\n\r\n# hello\r\nfoo\r\n');
+		assert.equal(cells.length, 2);
+		assert.equal(cells[0].content, 'let x = 1;');
+		assert.equal(cells[0].leadingWhitespace, '');
+		assert.equal(cells[0].trailingWhitespace, '\n\n');
+
+		assert.equal(cells[1].content, '# hello\nfoo');
+		assert.equal(cells[1].leadingWhitespace, '');
+		assert.equal(cells[1].trailingWhitespace, '\n');
+	});
 });
 
 function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell {

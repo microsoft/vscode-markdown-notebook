@@ -54,7 +54,7 @@ function isCodeBlockEndLine(line: string): boolean {
 }
 
 export function parseMarkdown(content: string): RawNotebookCell[] {
-	const lines = content.split('\n');
+	const lines = content.split(/\r?\n/g);
 	let cells: RawNotebookCell[] = [];
 	let i = 0;
 
@@ -153,7 +153,7 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 			const indentation = cell.metadata.custom?.indentation || '';
 			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
-			const contents = cell.document.getText().split('\n')
+			const contents = cell.document.getText().split(/\r?\n/g)
 				.map(line => indentation + line)
 				.join('\n');
 			const codeSuffix = '\n' + indentation + '```';
