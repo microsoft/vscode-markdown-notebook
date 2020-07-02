@@ -132,14 +132,82 @@ suite('writeMarkdown', () => {
 		assert.equal(writeCellsToMarkdown(cells), markdownStr);
 	}
 
-	test('writeMarkdown', () => {
-		testWriteMarkdown('# hello');
-		testWriteMarkdown('\n\n# hello\n\n');
-		testWriteMarkdown('# hello\n\ngoodbye');
+	suite('writeMarkdown', () => {
+		test('idempotent', () => {
+			testWriteMarkdown('# hello');
+			testWriteMarkdown('\n\n# hello\n\n');
+			testWriteMarkdown('# hello\n\ngoodbye');
 
-		testWriteMarkdown('```js\nlet x = 1;\n```\n\n# hello\n');
-		testWriteMarkdown('```js\nlet x = 1;\n```\n\n```ts\nlet y = 2;\n```\n# hello\n');
+			testWriteMarkdown('```js\nlet x = 1;\n```\n\n# hello\n');
+			testWriteMarkdown('```js\nlet x = 1;\n```\n\n```ts\nlet y = 2;\n```\n# hello\n');
 
-		testWriteMarkdown('    ```js\n    // indented code cell\n    ```');
+			testWriteMarkdown('    ```js\n    // indented code cell\n    ```');
+		});
+
+		test('append markdown cells', () => {
+			const cells = parseMarkdown(`# hello`)
+				.map(rawToNotebookCellData);
+			cells.push(<vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Markdown,
+				language: 'markdown',
+				metadata: {},
+				outputs: [],
+				source: 'foo'
+			});
+			cells.push(<vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Markdown,
+				language: 'markdown',
+				metadata: {},
+				outputs: [],
+				source: 'bar'
+			});
+
+			const vscodeCells = cells.map(cellDataToFakeCell);
+			assert.equal(writeCellsToMarkdown(vscodeCells), `# hello\n\nfoo\n\nbar\n`);
+		});
+
+		test('append code cells', () => {
+			const cells = parseMarkdown('```ts\nsome code\n```')
+				.map(rawToNotebookCellData);
+			cells.push(<vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Code,
+				language: 'typescript',
+				metadata: {},
+				outputs: [],
+				source: 'foo'
+			});
+			cells.push(<vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Code,
+				language: 'typescript',
+				metadata: {},
+				outputs: [],
+				source: 'bar'
+			});
+
+			const vscodeCells = cells.map(cellDataToFakeCell);
+			assert.equal(writeCellsToMarkdown(vscodeCells), '```ts\nsome code\n```\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n');
+		});
+
+		test('insert cells', () => {
+			const cells = parseMarkdown('# Hello\n\n## Header 2')
+				.map(rawToNotebookCellData);
+			cells.splice(1, 0, <vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Code,
+				language: 'typescript',
+				metadata: {},
+				outputs: [],
+				source: 'foo'
+			});
+			cells.splice(2, 0, <vscode.NotebookCellData>{
+				cellKind: vscode.CellKind.Code,
+				language: 'typescript',
+				metadata: {},
+				outputs: [],
+				source: 'bar'
+			});
+
+			const vscodeCells = cells.map(cellDataToFakeCell);
+			assert.equal(writeCellsToMarkdown(vscodeCells), '# Hello\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n\n## Header 2');
+		});
 	});
 });

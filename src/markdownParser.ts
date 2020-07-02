@@ -148,7 +148,10 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 	let result = '';
 	for (let i = 0; i < cells.length; i++) {
 		const cell = cells[i];
-		result += cell.metadata.custom?.leadingWhitespace || '';
+		if (i === 0) {
+			result += cell.metadata.custom?.leadingWhitespace ?? '';
+		}
+
 		if (cell.cellKind === vscode.CellKind.Code) {
 			const indentation = cell.metadata.custom?.indentation || '';
 			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
@@ -162,7 +165,32 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 		} else {
 			result += cell.document.getText();
 		}
-		result += cell.metadata.custom?.trailingWhitespace || '';
+
+		result += getBetweenCellsWhitespace(cells, i);
 	}
 	return result;
+}
+
+function getBetweenCellsWhitespace(cells: vscode.NotebookCell[], idx: number): string {
+	const thisCell = cells[idx];
+	const nextCell = cells[idx + 1];
+
+	if (!nextCell) {
+		return thisCell.metadata.custom?.trailingWhitespace ?? '\n';
+	}
+
+	const trailing = thisCell.metadata.custom?.trailingWhitespace;
+	const leading = nextCell.metadata.custom?.leadingWhitespace;
+
+	if (typeof trailing === 'string' && typeof leading === 'string') {
+		return trailing + leading;
+	}
+
+	// One of the cells is new
+	const combined = (trailing ?? '') + (leading ?? '');
+	if (!combined || combined === '\n') {
+		return '\n\n';
+	}
+
+	return combined;
 }
