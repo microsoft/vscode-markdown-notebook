@@ -11,7 +11,14 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 class MarkdownProvider implements vscode.NotebookContentProvider {
-	options?: vscode.NotebookDocumentContentOptions | undefined;
+	options?: vscode.NotebookDocumentContentOptions = {
+		transientMetadata: {
+			runnable: true,
+			editable: true,
+			custom: true
+		},
+		transientOutputs: true
+	};
 
 	onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
 
