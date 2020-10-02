@@ -11,7 +11,25 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 class MarkdownProvider implements vscode.NotebookContentProvider {
-	async openNotebook(uri: vscode.Uri, _openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
+	options?: vscode.NotebookDocumentContentOptions | undefined;
+
+	onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
+
+	async resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> { }
+
+	async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
+		await this.saveNotebookAs(context.destination, document, cancellation);
+		return {
+			id: context.destination.toString(),
+			delete: () => vscode.workspace.fs.delete(context.destination)
+		};
+	}
+
+	async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
+		if (openContext.backupId) {
+			uri = vscode.Uri.parse(openContext.backupId);
+		}
+
 		const languages = ALL_LANGUAGES;
 		const metadata: vscode.NotebookDocumentMetadata = { editable: true, cellEditable: true, cellHasExecutionOrder: false, cellRunnable: false, runnable: false };
 		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))

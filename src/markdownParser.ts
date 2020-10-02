@@ -144,7 +144,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 	return cells;
 }
 
-export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
+export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCell>): string {
 	let result = '';
 	for (let i = 0; i < cells.length; i++) {
 		const cell = cells[i];
@@ -171,7 +171,7 @@ export function writeCellsToMarkdown(cells: vscode.NotebookCell[]): string {
 	return result;
 }
 
-function getBetweenCellsWhitespace(cells: vscode.NotebookCell[], idx: number): string {
+function getBetweenCellsWhitespace(cells: ReadonlyArray<vscode.NotebookCell>, idx: number): string {
 	const thisCell = cells[idx];
 	const nextCell = cells[idx + 1];
 

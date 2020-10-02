@@ -117,7 +117,8 @@ function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell 
 		} as any,
 		cellKind: cell.cellKind,
 		language: cell.language,
-		metadata: cell.metadata,
+		metadata: cell.metadata || {},
+		index: -1,
 		notebook: undefined as any,
 		outputs: [],
 		uri: undefined as any
