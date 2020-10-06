@@ -6,19 +6,21 @@
 import * as vscode from 'vscode';
 import { parseMarkdown, writeCellsToMarkdown, RawNotebookCell } from './markdownParser';
 
+const providerOptions = {
+	transientMetadata: {
+		runnable: true,
+		editable: true,
+		custom: true,
+	},
+	transientOutputs: true
+};
+
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown-notebook', new MarkdownProvider()));
+	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown-notebook', new MarkdownProvider(), providerOptions));
 }
 
 class MarkdownProvider implements vscode.NotebookContentProvider {
-	options?: vscode.NotebookDocumentContentOptions = {
-		transientMetadata: {
-			runnable: true,
-			editable: true,
-			custom: true
-		},
-		transientOutputs: true
-	};
+	options?: vscode.NotebookDocumentContentOptions = providerOptions;
 
 	onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
 
