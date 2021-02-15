@@ -149,14 +149,14 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown(`# hello`)
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Markdown,
+				cellKind: vscode.NotebookCellKind.Markdown,
 				language: 'markdown',
 				metadata: {},
 				outputs: [],
 				source: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Markdown,
+				cellKind: vscode.NotebookCellKind.Markdown,
 				language: 'markdown',
 				metadata: {},
 				outputs: [],
@@ -171,14 +171,14 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown('```ts\nsome code\n```')
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Code,
+				cellKind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
 				metadata: {},
 				outputs: [],
 				source: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Code,
+				cellKind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
 				metadata: {},
 				outputs: [],
@@ -193,14 +193,14 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown('# Hello\n\n## Header 2')
 				.map(rawToNotebookCellData);
 			cells.splice(1, 0, <vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Code,
+				cellKind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
 				metadata: {},
 				outputs: [],
 				source: 'foo'
 			});
 			cells.splice(2, 0, <vscode.NotebookCellData>{
-				cellKind: vscode.CellKind.Code,
+				cellKind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
 				metadata: {},
 				outputs: [],

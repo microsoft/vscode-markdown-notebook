@@ -39,7 +39,6 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 			uri = vscode.Uri.parse(openContext.backupId);
 		}
 
-		const languages = ALL_LANGUAGES;
 		const metadata: vscode.NotebookDocumentMetadata = { editable: true, cellEditable: true, cellHasExecutionOrder: false, cellRunnable: false, runnable: false };
 		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
 			.toString('utf8');
@@ -48,7 +47,6 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 		const cells = cellRawData.map(rawToNotebookCellData);
 
 		return {
-			languages,
 			metadata,
 			cells
 		};
@@ -63,9 +61,6 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 		const stringOutput = writeCellsToMarkdown(document.cells);
 		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(stringOutput));
 	}
-
-	private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
-	readonly onDidChangeNotebook = this._onDidChangeNotebook.event;
 }
 
 export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCellData {

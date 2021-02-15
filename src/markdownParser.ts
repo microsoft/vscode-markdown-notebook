@@ -11,7 +11,7 @@ export interface RawNotebookCell {
 	trailingWhitespace: string;
 	language: string;
 	content: string;
-	kind: vscode.CellKind;
+	kind: vscode.NotebookCellKind;
 }
 
 const LANG_IDS = new Map([
@@ -108,7 +108,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 		cells.push({
 			language,
 			content,
-			kind: vscode.CellKind.Code,
+			kind: vscode.NotebookCellKind.Code,
 			leadingWhitespace: leadingWhitespace,
 			trailingWhitespace: trailingWhitespace,
 			indentation: codeBlockStart.indentation
@@ -135,7 +135,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 		cells.push({
 			language: 'markdown',
 			content,
-			kind: vscode.CellKind.Markdown,
+			kind: vscode.NotebookCellKind.Markdown,
 			leadingWhitespace: leadingWhitespace,
 			trailingWhitespace: trailingWhitespace
 		});
@@ -152,7 +152,7 @@ export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCell>):
 			result += cell.metadata.custom?.leadingWhitespace ?? '';
 		}
 
-		if (cell.cellKind === vscode.CellKind.Code) {
+		if (cell.cellKind === vscode.NotebookCellKind.Code) {
 			const indentation = cell.metadata.custom?.indentation || '';
 			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
