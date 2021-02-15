@@ -3,11 +3,11 @@
 	"publisher": "ms-vscode",
 	"displayName": "Markdown Notebook",
 	"description": "An extension for editing markdown files in VS Code notebooks",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"preview": true,
 	"enableProposedApi": true,
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.54.0"
 	},
 	"repository": {
 		"url": "https://github.com/microsoft/vscode-markdown-notebook"
