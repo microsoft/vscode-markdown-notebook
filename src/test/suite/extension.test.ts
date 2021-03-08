@@ -115,9 +115,9 @@ function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell 
 		document: {
 			getText: () => cell.source
 		} as any,
-		cellKind: cell.cellKind,
+		cellKind: cell.kind,
 		language: cell.language,
-		metadata: cell.metadata || {},
+		metadata: cell.metadata || new vscode.NotebookCellMetadata(),
 		index: -1,
 		notebook: undefined as any,
 		outputs: [],
@@ -149,16 +149,16 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown(`# hello`)
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Markdown,
+				kind: vscode.NotebookCellKind.Markdown,
 				language: 'markdown',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Markdown,
+				kind: vscode.NotebookCellKind.Markdown,
 				language: 'markdown',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'bar'
 			});
@@ -171,16 +171,16 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown('```ts\nsome code\n```')
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Code,
+				kind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Code,
+				kind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'bar'
 			});
@@ -193,16 +193,16 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown('# Hello\n\n## Header 2')
 				.map(rawToNotebookCellData);
 			cells.splice(1, 0, <vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Code,
+				kind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'foo'
 			});
 			cells.splice(2, 0, <vscode.NotebookCellData>{
-				cellKind: vscode.NotebookCellKind.Code,
+				kind: vscode.NotebookCellKind.Code,
 				language: 'typescript',
-				metadata: {},
+				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
 				source: 'bar'
 			});
