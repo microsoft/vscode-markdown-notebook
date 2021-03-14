@@ -43,8 +43,6 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 			editable: true,
 			cellEditable: true,
 			cellHasExecutionOrder: false,
-			cellRunnable: false,
-			runnable: false
 		});
 		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
 			.toString('utf8');
@@ -73,7 +71,7 @@ export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCel
 	return <vscode.NotebookCellData>{
 		kind: data.kind,
 		language: data.language,
-		metadata: new vscode.NotebookCellMetadata().with({ editable: true, runnable: false, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } }),
+		metadata: new vscode.NotebookCellMetadata().with({ editable: true, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } }),
 		outputs: [],
 		source: data.content
 	};

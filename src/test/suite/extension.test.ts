@@ -113,15 +113,14 @@ suite('parseMarkdown', () => {
 function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell {
 	return {
 		document: {
-			getText: () => cell.source
+			getText: () => cell.source,
+			languageId: cell.language
 		} as any,
-		cellKind: cell.kind,
-		language: cell.language,
+		kind: cell.kind,
 		metadata: cell.metadata || new vscode.NotebookCellMetadata(),
 		index: -1,
 		notebook: undefined as any,
-		outputs: [],
-		uri: undefined as any
+		outputs: []
 	};
 }
 

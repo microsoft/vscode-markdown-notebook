@@ -152,9 +152,9 @@ export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCell>):
 			result += cell.metadata.custom?.leadingWhitespace ?? '';
 		}
 
-		if (cell.cellKind === vscode.NotebookCellKind.Code) {
+		if (cell.kind === vscode.NotebookCellKind.Code) {
 			const indentation = cell.metadata.custom?.indentation || '';
-			const languageAbbrev = LANG_ABBREVS.get(cell.language) || cell.language;
+			const languageAbbrev = LANG_ABBREVS.get(cell.document.languageId) ?? cell.document.languageId;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
 			const contents = cell.document.getText().split(/\r?\n/g)
 				.map(line => indentation + line)
