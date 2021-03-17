@@ -2,8 +2,8 @@
 
 - Requires VS Code Insiders
 - Install extension
-- Open .md file
-- "Reopen With" -> "Markdown Notebook"
+- Right click on a markdown file
+- Choose "Open With...", then choose "Markdown Notebook"
 
 ### Note
 This is a very simple extension for selfhosting notebook support in VS Code. It tries to maintain the formatting of your markdown file, but you may see minor tweaks. No warrantee given. It does not maintain line endings (it will read CRLF but will output LF).
