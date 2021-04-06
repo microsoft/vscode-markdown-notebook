@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { parseMarkdown, writeCellsToMarkdown, RawNotebookCell } from './markdownParser';
+import * as yaml from 'js-yaml';
 
 const providerOptions = {
 	transientMetadata: {
@@ -17,6 +18,9 @@ const providerOptions = {
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown-notebook', new MarkdownProvider(), providerOptions));
+
+	// only update metadata 200ms after the last change, to avoid spamming
+	vscode.workspace.onDidChangeTextDocument(debounce(updateFrontmatter, 200), null, context.subscriptions);
 }
 
 class MarkdownProvider implements vscode.NotebookContentProvider {
@@ -39,15 +43,18 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 			uri = vscode.Uri.parse(openContext.backupId);
 		}
 
+		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
+			.toString('utf8');
+		const cellRawData = parseMarkdown(content);
+
 		const metadata = new vscode.NotebookDocumentMetadata().with({
 			editable: true,
 			cellEditable: true,
 			cellHasExecutionOrder: false,
+			custom: {
+				frontmatter: cellRawData[0]?.isEmbeddedYaml ? cellRawData[0].yaml : null,
+			}
 		});
-		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
-			.toString('utf8');
-
-		const cellRawData = parseMarkdown(content);
 		const cells = cellRawData.map(rawToNotebookCellData);
 
 		return {
@@ -71,10 +78,77 @@ export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCel
 	return <vscode.NotebookCellData>{
 		kind: data.kind,
 		language: data.language,
-		metadata: new vscode.NotebookCellMetadata().with({ editable: true, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } }),
+		metadata: new vscode.NotebookCellMetadata().with({ editable: true, custom: {
+			leadingWhitespace: data.leadingWhitespace,
+			trailingWhitespace: data.trailingWhitespace,
+			indentation: data.indentation,
+			isEmbeddedYaml: data.isEmbeddedYaml,
+		} }),
 		outputs: [],
 		source: data.content
 	};
+}
+
+function debounce<T>(handler: (e: T) => void, interval: number): (e: T) => void {
+	let timeoutId: NodeJS.Timeout | undefined;
+
+	return (e: T) => {
+		if (typeof timeoutId !== 'undefined') {
+			clearTimeout(timeoutId);
+		}
+
+		timeoutId = setTimeout(() => handler(e), interval);
+	};
+}
+
+function updateFrontmatter(event: vscode.TextDocumentChangeEvent) {
+	// TODO: can we explicitly check if the notebook is ours?
+	const cell = isFrontmatterCell(event.document);
+	if (!cell) {
+		return;
+	}
+
+	const editor = vscode.window.visibleNotebookEditors.find(editor => editor.document === cell.notebook);
+	if (!editor) {
+		// editor is not visible
+		// TODO: can we modify notebook metadata if the editor is not visible, without forcing it to the front?
+		return;
+	}
+
+	let frontmatter: object | string | number | null | undefined;
+	try {
+		frontmatter = yaml.load(cell.document.getText());
+	} catch (error) {
+		// invalid YAML
+		return;
+	}
+
+	editor.edit(edit => {
+		edit.replaceMetadata(cell.notebook.metadata.with({ custom: { frontmatter }}));
+	});
+
+	function isFrontmatterCell(document: vscode.TextDocument): vscode.NotebookCell | undefined {
+		if (!document.notebook) {
+			// document is not a notebook or cell
+			return;
+		}
+
+		if (!/\.(md|markdown)$/.test(document.uri.path)) {
+			// notebook is not ours
+			return;
+		}
+
+		const cell = document.notebook!.cells.find(cell => cell.document === document);
+		if (!cell) {
+			// document is not a cell
+			return;
+		}
+
+		if (cell.index === 0 && cell.metadata.custom?.isEmbeddedYaml) {
+			// cell is frontmatter
+			return cell;
+		}
+	}
 }
 
 export function deactivate() { }
