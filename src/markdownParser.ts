@@ -61,6 +61,9 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 	// Each parse function starts with line i, leaves i on the line after the last line parsed
 	for (; i < lines.length;) {
 		const leadingWhitespace = i === 0 ? parseWhitespaceLines(true) : '';
+		if (i >= lines.length) {
+			break;
+		}
 		const codeBlockMatch = parseCodeBlockStart(lines[i]);
 		if (codeBlockMatch) {
 			parseCodeBlock(leadingWhitespace, codeBlockMatch);
