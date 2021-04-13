@@ -120,7 +120,8 @@ function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell 
 		metadata: cell.metadata || new vscode.NotebookCellMetadata(),
 		index: -1,
 		notebook: undefined as any,
-		outputs: []
+		outputs: [],
+		latestExecutionSummary: undefined
 	};
 }
 

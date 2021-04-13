@@ -42,7 +42,6 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 		const metadata = new vscode.NotebookDocumentMetadata().with({
 			editable: true,
 			cellEditable: true,
-			cellHasExecutionOrder: false,
 		});
 		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
 			.toString('utf8');
@@ -57,12 +56,12 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 	}
 
 	async saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-		const stringOutput = writeCellsToMarkdown(document.cells);
+		const stringOutput = writeCellsToMarkdown(document.getCells());
 		await vscode.workspace.fs.writeFile(document.uri, Buffer.from(stringOutput));
 	}
 
 	async saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-		const stringOutput = writeCellsToMarkdown(document.cells);
+		const stringOutput = writeCellsToMarkdown(document.getCells());
 		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(stringOutput));
 	}
 }
