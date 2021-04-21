@@ -16,34 +16,16 @@ const providerOptions = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('markdown-notebook', new MarkdownProvider(), providerOptions));
+	context.subscriptions.push(vscode.notebook.registerNotebookSerializer('markdown-notebook', new MarkdownProvider(), providerOptions));
 }
 
-class MarkdownProvider implements vscode.NotebookContentProvider {
-	options?: vscode.NotebookDocumentContentOptions = providerOptions;
-
-	onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
-
-	async resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> { }
-
-	async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
-		await this.saveNotebookAs(context.destination, document, cancellation);
-		return {
-			id: context.destination.toString(),
-			delete: () => vscode.workspace.fs.delete(context.destination)
-		};
-	}
-
-	async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
-		if (openContext.backupId) {
-			uri = vscode.Uri.parse(openContext.backupId);
-		}
-
+class MarkdownProvider implements vscode.NotebookSerializer {
+	deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): vscode.NotebookData | Thenable<vscode.NotebookData> {
 		const metadata = new vscode.NotebookDocumentMetadata().with({
 			editable: true,
 			cellEditable: true,
 		});
-		const content = Buffer.from(await vscode.workspace.fs.readFile(uri))
+		const content = Buffer.from(data)
 			.toString('utf8');
 
 		const cellRawData = parseMarkdown(content);
@@ -55,14 +37,9 @@ class MarkdownProvider implements vscode.NotebookContentProvider {
 		};
 	}
 
-	async saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-		const stringOutput = writeCellsToMarkdown(document.getCells());
-		await vscode.workspace.fs.writeFile(document.uri, Buffer.from(stringOutput));
-	}
-
-	async saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-		const stringOutput = writeCellsToMarkdown(document.getCells());
-		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(stringOutput));
+	serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Uint8Array | Thenable<Uint8Array> {
+		const stringOutput = writeCellsToMarkdown(data.cells);
+		return Buffer.from(stringOutput);
 	}
 }
 

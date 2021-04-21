@@ -110,26 +110,10 @@ suite('parseMarkdown', () => {
 	});
 });
 
-function cellDataToFakeCell(cell: vscode.NotebookCellData): vscode.NotebookCell {
-	return {
-		document: {
-			getText: () => cell.source,
-			languageId: cell.language
-		} as any,
-		kind: cell.kind,
-		metadata: cell.metadata || new vscode.NotebookCellMetadata(),
-		index: -1,
-		notebook: undefined as any,
-		outputs: [],
-		latestExecutionSummary: undefined
-	};
-}
-
 suite('writeMarkdown', () => {
 	function testWriteMarkdown(markdownStr: string) {
 		const cells = parseMarkdown(markdownStr)
-			.map(rawToNotebookCellData)
-			.map(cellDataToFakeCell);
+			.map(rawToNotebookCellData);
 		assert.equal(writeCellsToMarkdown(cells), markdownStr);
 	}
 
@@ -163,8 +147,7 @@ suite('writeMarkdown', () => {
 				source: 'bar'
 			});
 
-			const vscodeCells = cells.map(cellDataToFakeCell);
-			assert.equal(writeCellsToMarkdown(vscodeCells), `# hello\n\nfoo\n\nbar\n`);
+			assert.equal(writeCellsToMarkdown(cells), `# hello\n\nfoo\n\nbar\n`);
 		});
 
 		test('append code cells', () => {
@@ -185,8 +168,7 @@ suite('writeMarkdown', () => {
 				source: 'bar'
 			});
 
-			const vscodeCells = cells.map(cellDataToFakeCell);
-			assert.equal(writeCellsToMarkdown(vscodeCells), '```ts\nsome code\n```\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n');
+			assert.equal(writeCellsToMarkdown(cells), '```ts\nsome code\n```\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n');
 		});
 
 		test('insert cells', () => {
@@ -207,8 +189,7 @@ suite('writeMarkdown', () => {
 				source: 'bar'
 			});
 
-			const vscodeCells = cells.map(cellDataToFakeCell);
-			assert.equal(writeCellsToMarkdown(vscodeCells), '# Hello\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n\n## Header 2');
+			assert.equal(writeCellsToMarkdown(cells), '# Hello\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n\n## Header 2');
 		});
 	});
 });

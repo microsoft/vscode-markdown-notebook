@@ -144,26 +144,26 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 	return cells;
 }
 
-export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCell>): string {
+export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCellData>): string {
 	let result = '';
 	for (let i = 0; i < cells.length; i++) {
 		const cell = cells[i];
 		if (i === 0) {
-			result += cell.metadata.custom?.leadingWhitespace ?? '';
+			result += cell.metadata?.custom?.leadingWhitespace ?? '';
 		}
 
 		if (cell.kind === vscode.NotebookCellKind.Code) {
-			const indentation = cell.metadata.custom?.indentation || '';
-			const languageAbbrev = LANG_ABBREVS.get(cell.document.languageId) ?? cell.document.languageId;
+			const indentation = cell.metadata?.custom?.indentation || '';
+			const languageAbbrev = LANG_ABBREVS.get(cell.language) ?? cell.language;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
-			const contents = cell.document.getText().split(/\r?\n/g)
+			const contents = cell.source.split(/\r?\n/g)
 				.map(line => indentation + line)
 				.join('\n');
 			const codeSuffix = '\n' + indentation + '```';
 
 			result += codePrefix + contents + codeSuffix;
 		} else {
-			result += cell.document.getText();
+			result += cell.source;
 		}
 
 		result += getBetweenCellsWhitespace(cells, i);
@@ -171,16 +171,16 @@ export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCell>):
 	return result;
 }
 
-function getBetweenCellsWhitespace(cells: ReadonlyArray<vscode.NotebookCell>, idx: number): string {
+function getBetweenCellsWhitespace(cells: ReadonlyArray<vscode.NotebookCellData>, idx: number): string {
 	const thisCell = cells[idx];
 	const nextCell = cells[idx + 1];
 
 	if (!nextCell) {
-		return thisCell.metadata.custom?.trailingWhitespace ?? '\n';
+		return thisCell.metadata?.custom?.trailingWhitespace ?? '\n';
 	}
 
-	const trailing = thisCell.metadata.custom?.trailingWhitespace;
-	const leading = nextCell.metadata.custom?.leadingWhitespace;
+	const trailing = thisCell.metadata?.custom?.trailingWhitespace;
+	const leading = nextCell.metadata?.custom?.leadingWhitespace;
 
 	if (typeof trailing === 'string' && typeof leading === 'string') {
 		return trailing + leading;
