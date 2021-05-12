@@ -133,18 +133,18 @@ suite('writeMarkdown', () => {
 			const cells = parseMarkdown(`# hello`)
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
-				kind: vscode.NotebookCellKind.Markdown,
-				language: 'markdown',
+				kind: vscode.NotebookCellKind.Markup,
+				languageId: 'markdown',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'foo'
+				value: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
-				kind: vscode.NotebookCellKind.Markdown,
-				language: 'markdown',
+				kind: vscode.NotebookCellKind.Markup,
+				languageId: 'markdown',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'bar'
+				value: 'bar'
 			});
 
 			assert.equal(writeCellsToMarkdown(cells), `# hello\n\nfoo\n\nbar\n`);
@@ -155,17 +155,17 @@ suite('writeMarkdown', () => {
 				.map(rawToNotebookCellData);
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
-				language: 'typescript',
+				languageId: 'typescript',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'foo'
+				value: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
-				language: 'typescript',
+				languageId: 'typescript',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'bar'
+				value: 'bar'
 			});
 
 			assert.equal(writeCellsToMarkdown(cells), '```ts\nsome code\n```\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n');
@@ -176,17 +176,17 @@ suite('writeMarkdown', () => {
 				.map(rawToNotebookCellData);
 			cells.splice(1, 0, <vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
-				language: 'typescript',
+				languageId: 'typescript',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'foo'
+				value: 'foo'
 			});
 			cells.splice(2, 0, <vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
-				language: 'typescript',
+				languageId: 'typescript',
 				metadata: new vscode.NotebookCellMetadata(),
 				outputs: [],
-				source: 'bar'
+				value: 'bar'
 			});
 
 			assert.equal(writeCellsToMarkdown(cells), '# Hello\n\n```ts\nfoo\n```\n\n```ts\nbar\n```\n\n## Header 2');

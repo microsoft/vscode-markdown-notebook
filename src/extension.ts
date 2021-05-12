@@ -46,10 +46,10 @@ class MarkdownProvider implements vscode.NotebookSerializer {
 export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCellData {
 	return <vscode.NotebookCellData>{
 		kind: data.kind,
-		language: data.language,
+		languageId: data.language,
 		metadata: new vscode.NotebookCellMetadata().with({ editable: true, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } }),
 		outputs: [],
-		source: data.content
+		value: data.content
 	};
 }
 

@@ -7,7 +7,7 @@
 	"preview": true,
 	"enableProposedApi": true,
 	"engines": {
-		"vscode": "^1.54.0"
+		"vscode": "^1.57.0"
 	},
 	"repository": {
 		"url": "https://github.com/microsoft/vscode-markdown-notebook"
@@ -26,7 +26,7 @@
 		}
 	},
 	"contributes": {
-		"notebookProvider": [
+		"notebooks": [
 			{
 				"viewType": "markdown-notebook",
 				"displayName": "Markdown Notebook",
@@ -52,7 +52,7 @@
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
 		"@types/node": "^13.11.0",
-		"@types/vscode": "^1.50.0",
+		"@types/vscode": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^2.30.0",
 		"@typescript-eslint/parser": "^2.30.0",
 		"eslint": "^6.8.0",

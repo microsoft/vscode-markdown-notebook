@@ -135,7 +135,7 @@ export function parseMarkdown(content: string): RawNotebookCell[] {
 		cells.push({
 			language: 'markdown',
 			content,
-			kind: vscode.NotebookCellKind.Markdown,
+			kind: vscode.NotebookCellKind.Markup,
 			leadingWhitespace: leadingWhitespace,
 			trailingWhitespace: trailingWhitespace
 		});
@@ -154,16 +154,16 @@ export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCellDat
 
 		if (cell.kind === vscode.NotebookCellKind.Code) {
 			const indentation = cell.metadata?.custom?.indentation || '';
-			const languageAbbrev = LANG_ABBREVS.get(cell.language) ?? cell.language;
+			const languageAbbrev = LANG_ABBREVS.get(cell.languageId) ?? cell.languageId;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
-			const contents = cell.source.split(/\r?\n/g)
+			const contents = cell.value.split(/\r?\n/g)
 				.map(line => indentation + line)
 				.join('\n');
 			const codeSuffix = '\n' + indentation + '```';
 
 			result += codePrefix + contents + codeSuffix;
 		} else {
-			result += cell.source;
+			result += cell.value;
 		}
 
 		result += getBetweenCellsWhitespace(cells, i);
