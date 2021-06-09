@@ -16,15 +16,11 @@ const providerOptions = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.notebook.registerNotebookSerializer('markdown-notebook', new MarkdownProvider(), providerOptions));
+	context.subscriptions.push(vscode.workspace.registerNotebookSerializer('markdown-notebook', new MarkdownProvider(), providerOptions));
 }
 
 class MarkdownProvider implements vscode.NotebookSerializer {
 	deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): vscode.NotebookData | Thenable<vscode.NotebookData> {
-		const metadata = new vscode.NotebookDocumentMetadata().with({
-			editable: true,
-			cellEditable: true,
-		});
 		const content = Buffer.from(data)
 			.toString('utf8');
 
@@ -32,7 +28,6 @@ class MarkdownProvider implements vscode.NotebookSerializer {
 		const cells = cellRawData.map(rawToNotebookCellData);
 
 		return {
-			metadata,
 			cells
 		};
 	}
@@ -47,7 +42,7 @@ export function rawToNotebookCellData(data: RawNotebookCell): vscode.NotebookCel
 	return <vscode.NotebookCellData>{
 		kind: data.kind,
 		languageId: data.language,
-		metadata: new vscode.NotebookCellMetadata().with({ editable: true, custom: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation } }),
+		metadata: { leadingWhitespace: data.leadingWhitespace, trailingWhitespace: data.trailingWhitespace, indentation: data.indentation },
 		outputs: [],
 		value: data.content
 	};

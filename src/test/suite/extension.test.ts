@@ -135,14 +135,14 @@ suite('writeMarkdown', () => {
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Markup,
 				languageId: 'markdown',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Markup,
 				languageId: 'markdown',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'bar'
 			});
@@ -156,14 +156,14 @@ suite('writeMarkdown', () => {
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
 				languageId: 'typescript',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'foo'
 			});
 			cells.push(<vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
 				languageId: 'typescript',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'bar'
 			});
@@ -177,14 +177,14 @@ suite('writeMarkdown', () => {
 			cells.splice(1, 0, <vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
 				languageId: 'typescript',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'foo'
 			});
 			cells.splice(2, 0, <vscode.NotebookCellData>{
 				kind: vscode.NotebookCellKind.Code,
 				languageId: 'typescript',
-				metadata: new vscode.NotebookCellMetadata(),
+				metadata: {},
 				outputs: [],
 				value: 'bar'
 			});
