@@ -16,7 +16,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"onNotebook:markdown-notebook"
 	],
 	"main": "./out/extension.js",
 	"capabilities": {
