@@ -149,11 +149,11 @@ export function writeCellsToMarkdown(cells: ReadonlyArray<vscode.NotebookCellDat
 	for (let i = 0; i < cells.length; i++) {
 		const cell = cells[i];
 		if (i === 0) {
-			result += cell.metadata?.custom?.leadingWhitespace ?? '';
+			result += cell.metadata?.leadingWhitespace ?? '';
 		}
 
 		if (cell.kind === vscode.NotebookCellKind.Code) {
-			const indentation = cell.metadata?.custom?.indentation || '';
+			const indentation = cell.metadata?.indentation || '';
 			const languageAbbrev = LANG_ABBREVS.get(cell.languageId) ?? cell.languageId;
 			const codePrefix = indentation + '```' + languageAbbrev + '\n';
 			const contents = cell.value.split(/\r?\n/g)
@@ -176,11 +176,11 @@ function getBetweenCellsWhitespace(cells: ReadonlyArray<vscode.NotebookCellData>
 	const nextCell = cells[idx + 1];
 
 	if (!nextCell) {
-		return thisCell.metadata?.custom?.trailingWhitespace ?? '\n';
+		return thisCell.metadata?.trailingWhitespace ?? '\n';
 	}
 
-	const trailing = thisCell.metadata?.custom?.trailingWhitespace;
-	const leading = nextCell.metadata?.custom?.leadingWhitespace;
+	const trailing = thisCell.metadata?.trailingWhitespace;
+	const leading = nextCell.metadata?.leadingWhitespace;
 
 	if (typeof trailing === 'string' && typeof leading === 'string') {
 		return trailing + leading;
