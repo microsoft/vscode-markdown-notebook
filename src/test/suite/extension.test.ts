@@ -108,6 +108,11 @@ suite('parseMarkdown', () => {
 		assert.strictEqual(cells[1].leadingWhitespace, '');
 		assert.strictEqual(cells[1].trailingWhitespace, '\n');
 	});
+
+	test('empty', () => {
+		const cells = parseMarkdown('');
+		assert.strictEqual(cells.length, 0);
+	});
 });
 
 suite('writeMarkdown', () => {
