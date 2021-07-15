@@ -1,12 +1,14 @@
-# vscode-markdown-notebook
+# Markdown Notebook
 
-- Requires VS Code Insiders
-- Install extension
-- Right click on a markdown file
-- Choose "Open With...", then choose "Markdown Notebook"
+This is a simple extension for opening a markdown file in a VS Code notebook. It shows text paragraphs in markdown cells, and code blocks in code cells. It doesn't support executing code cells (but you could write an extension that [adds that functionality](https://github.com/microsoft/vscode/blob/50b3811fdc5b5c80ca516a2edfffedcbd464b033/src/vs/vscode.d.ts#L12276)!). It tries to maintain the formatting of your markdown file, but you may see minor tweaks. No warrantee given. It does not maintain line endings (it will read CRLF but will output LF).
 
-### Note
-This is a very simple extension for selfhosting notebook support in VS Code. It tries to maintain the formatting of your markdown file, but you may see minor tweaks. No warrantee given. It does not maintain line endings (it will read CRLF but will output LF).
+![example](media/example.png)
+
+## Use
+
+- Install the extension
+- Right click a .md file, "Open With..."
+- Select "Markdown Notebook"
 
 # Contributing
 
