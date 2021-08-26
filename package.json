@@ -9,6 +9,9 @@
 	"engines": {
 		"vscode": "^1.57.0"
 	},
+	"extensionKind": [
+		"web"
+	],
 	"repository": {
 		"url": "https://github.com/microsoft/vscode-markdown-notebook"
 	},
@@ -19,6 +22,7 @@
 		"onNotebook:markdown-notebook"
 	],
 	"main": "./out/extension.js",
+	"browser": "./out/extension-bundle.js",
 	"capabilities": {
 		"virtualWorkspaces": true,
 		"untrustedWorkspaces": {
@@ -40,13 +44,14 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "yarn run compile",
+		"vscode:prepublish": "yarn run compile && yarn run bundle",
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"deploy": "npx vsce publish --noVerify",
 		"watch": "tsc -watch -p ./",
 		"pretest": "yarn run compile && yarn run lint",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"bundle": "npx esbuild src/extension.ts --bundle --outfile=out/extension-bundle.js --platform=node --external:vscode"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
@@ -54,6 +59,7 @@
 		"@types/node": "^13.11.0",
 		"@typescript-eslint/eslint-plugin": "^2.30.0",
 		"@typescript-eslint/parser": "^2.30.0",
+		"esbuild": "^0.12.23",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
 		"mocha": "^7.1.2",

@@ -19,10 +19,21 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.workspace.registerNotebookSerializer('markdown-notebook', new MarkdownProvider(), providerOptions));
 }
 
+// there are globals in workers and nodejs
+declare class TextDecoder {
+	decode(data: Uint8Array): string;
+}
+declare class TextEncoder {
+	encode(data: string): Uint8Array;
+}
+
 class MarkdownProvider implements vscode.NotebookSerializer {
+
+	private readonly decoder = new TextDecoder();
+	private readonly encoder = new TextEncoder();
+
 	deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): vscode.NotebookData | Thenable<vscode.NotebookData> {
-		const content = Buffer.from(data)
-			.toString('utf8');
+		const content = this.decoder.decode(data);
 
 		const cellRawData = parseMarkdown(content);
 		const cells = cellRawData.map(rawToNotebookCellData);
@@ -34,7 +45,7 @@ class MarkdownProvider implements vscode.NotebookSerializer {
 
 	serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Uint8Array | Thenable<Uint8Array> {
 		const stringOutput = writeCellsToMarkdown(data.cells);
-		return Buffer.from(stringOutput);
+		return this.encoder.encode(stringOutput);
 	}
 }
 
