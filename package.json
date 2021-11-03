@@ -3,7 +3,7 @@
 	"publisher": "ms-vscode",
 	"displayName": "Markdown Notebook",
 	"description": "An extension for editing markdown files in VS Code notebooks",
-	"version": "0.0.25",
+	"version": "0.0.26",
 	"preview": true,
 	"engines": {
 		"vscode": "^1.57.0"
