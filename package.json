@@ -5,7 +5,6 @@
 	"description": "An extension for editing markdown files in VS Code notebooks",
 	"version": "0.0.25",
 	"preview": true,
-	"enableProposedApi": true,
 	"engines": {
 		"vscode": "^1.57.0"
 	},
@@ -54,6 +53,7 @@
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
 		"@types/node": "^13.11.0",
+		"@types/vscode": "1.57",
 		"@typescript-eslint/eslint-plugin": "^2.30.0",
 		"@typescript-eslint/parser": "^2.30.0",
 		"esbuild": "^0.12.23",
