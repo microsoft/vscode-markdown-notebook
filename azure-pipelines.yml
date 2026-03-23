@@ -27,10 +27,10 @@ steps:
 
 - bash: |
     echo ">>> Compile, line, test"
-    yarn
-    yarn compile
-    yarn lint
-    yarn test
+    npm install
+    npm run compile
+    npm run lint
+    npm test
   displayName: Compile, Lint, Test
   env:
     DISPLAY: ':99.0'
