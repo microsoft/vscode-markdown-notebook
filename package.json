@@ -42,7 +42,7 @@
 	"scripts": {
 		"vscode:prepublish": "npm run compile && npm run bundle",
 		"compile": "tsc -p ./",
-		"lint": "eslint src --ext ts",
+		"lint": "eslint src",
 		"deploy": "npx vsce publish --noVerify",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
