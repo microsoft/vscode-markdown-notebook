@@ -37,6 +37,8 @@ steps:
 
 - bash: |
     echo ">>> Publish"
-    npm run deploy -- -p $(VSCODE_MARKETPLACE_TOKEN)
+    npm run deploy
   displayName: Publish
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+  env:
+    VSCE_PAT: $(VSCODE_MARKETPLACE_TOKEN)
